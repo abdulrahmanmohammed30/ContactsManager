@@ -18,12 +18,13 @@ namespace CrudProject.StartupExtensions
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<ICountryGetterService, CountryGetterService>();          
             services.AddScoped<ICountryAdderService, CountryAdderService>();
-            services.AddScoped<IPersonGetterService, PersonGetterService>();
+           //services.AddScoped<IPersonGetterService, PersonGetterService>();
+            services.AddScoped<PersonGetterService>();
             services.AddScoped<IPersonSorterService, PersonSorterService>();
             services.AddScoped<IPersonAdderService, PersonAdderService>();
             services.AddScoped<IPersonUpdaterService, PersonUpdaterService>();
             services.AddScoped<IPersonDeleterService, PersonDeleterService>();
-        
+            services.AddScoped<IPersonGetterService, PersonGetterServiceWithFewExcelFields>();
             services.AddScoped<HandleExceptionFilter>();
             
             services.AddScoped<ExecutionTimeActionFilter>();
