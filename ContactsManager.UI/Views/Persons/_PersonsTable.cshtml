@@ -1,0 +1,229 @@
+﻿@model List<PersonResponse>
+
+<div class="container mx-auto mt-8 max-h-full overflow-y-auto">
+    <div class="max-h-full overflow-y-auto">
+        <table class="max-h-[calc(100vh-12rem)] min-w-full overflow-y-auto rounded-lg bg-white shadow-md">
+            <!-- Table Header -->
+            <thead class="bg-gray-200 text-sm uppercase text-gray-700">
+                <tr id="tableHeaders">
+                    <th class="px-6 py-3 text-left" data-column="personId" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">ID</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="firstname" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">First Name</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="lastname" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Last Name</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="email" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Email</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="dateOfBirth" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Date of Birth</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="gender" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Gender</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="countryid" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Country</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="receiveNewsLetters" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Newsletters</a>
+                    </th>
+                    <th>
+                        <p class="transition hover:text-gray-600">Operations</p>
+                    </th>
+                </tr>
+            </thead>
+
+            <!-- Table Body -->
+            <tbody id="rows">
+                @foreach (var person in @Model)
+                {
+                   var countryName = string.IsNullOrWhiteSpace(@person.CountryName)? person.CountryName : "null";
+
+                    <tr class="border-b transition hover:bg-gray-100">
+                        <td class="px-6 py-4">@person.PersonId</td>
+                        <td class="px-6 py-4">@person.FirstName</td>
+                        <td class="px-6 py-4">@person.LastName</td>
+                        <td class="px-6 py-4">@person.Email</td>
+                        <td class="px-6 py-4">
+                            @if (person.DateOfBirth != null)
+                            {
+                                @DateOnly.FromDateTime(person.DateOfBirth.Value).ToString("yyyy-MM-dd")
+                            }
+                            else
+                            {
+                                <span>N/A</span> <!-- Or any placeholder for missing date -->
+                            }
+                        </td>
+                        <td class="px-6 py-4">@person.Gender</td>
+                    <td class="px-6 py-4">@countryName</td>
+                    <td class="px-6 py-4">
+                            @if (@person.ReceiveNewsLetters == true)
+                    {
+                        <text>Yes</text>
+                    }
+                    else
+                    {
+                        <text>No</text>
+                    }
+                        </td>
+                        <td>
+                            <a asp-controller="persons" asp-action="delete" asp-route-id="@person.PersonId" 
+                               class="text-red-500 transition hover:text-red-600">
+                                <i class="fas fa-trash-alt"></i> <!-- Font Awesome trash icon -->
+                            </a>
+                            <a asp-controller="persons" asp-action="update" asp-route-id="@person.PersonId"
+                               class="ml-2 text-blue-500 transition hover:text-blue-600">
+                                <i class="fas fa-edit"></i> <!-- Font Awesome edit icon -->
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const tableBody = document.getElementById("rows");
+            function populateTable(data) {
+                tableBody.innerHTML = ""; // Clear the existing rows
+
+                data.forEach(person => {
+
+                    const row = document.createElement("tr");
+                    row.className = "border-b transition hover:bg-gray-100";
+
+                    row.innerHTML = `
+                    <td class="px-6 py-4">${person.personId}</td>
+                    <td class="px-6 py-4">${person.firstName}</td>
+                    <td class="px-6 py-4">${person.lastName}</td>
+                    <td class="px-6 py-4">${person.email}</td>
+                    <td class="px-6 py-4">
+                        ${person.dateOfBirth ? new Date(person.dateOfBirth).toISOString().split('T')[0] : '<span>N/A</span>'}
+                    </td>
+                    <td class="px-6 py-4">${person.gender}</td>
+                    <td class="px-6 py-4">${person.countryName}</td>
+                    <td class="px-6 py-4">
+                        ${person.receiveNewsLetters ? "Yes": "No"}
+                    </td>
+                    <td>
+                            <a href="/persons/delete/${person.personId}"
+                               class="text-red-500 transition hover:text-red-600">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                            <a href="/persons/update/${person.personId}"
+                               class="ml-2 text-blue-500 transition hover:text-blue-600">
+                                <i class="fas fa-edit"></i>
+                            </a>    
+                    </td>
+                `;
+
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Example data loading and sorting mechanism
+            const tableHeaders = document.getElementById("tableHeaders");
+
+            tableHeaders.querySelectorAll('a').forEach(headerlink => {
+                headerlink.addEventListener('click', async (e) => {
+                    e.preventDefault();
+
+                    const th = headerlink.closest('th');
+                    const column = th.dataset.column;
+                    const currentSort = th.dataset.sort;
+                    const newSort = currentSort === 'asc' ? 'desc' : 'asc';
+                    th.dataset.sort = newSort;
+
+                    try {
+                        const response = await fetch(`/persons/sort?sortColumn=${column}&sortOrder=${newSort}`);
+                        const data = await response.json();
+                        populateTable(data); // Populate the table with sorted data
+                    } catch (error) {
+                        console.error("Error fetching sorted data:", error);
+                    }
+                });
+            });
+
+    @*     // Load initial data (optional, replace with an actual API call)
+            async function loadInitialData() {
+                try {
+                    const response = await fetch("/persons/initialData"); // Replace with your endpoint
+                    const data = await response.json();
+                    populateTable(data);
+                } catch (error) {
+                    console.error("Error loading initial data:", error);
+                }
+            }
+
+            //loadInitialData(); // Call this function to load the table when the page loads *@
+        });
+
+
+
+    @*
+        //   sortTable(column, newSort)
+        function sortTable(column, direction) {
+            const tbody = document.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            const sortedRows = rows.sort((a, b) => {
+                const aValue = getCellValue(a, column);
+                const bValue = getCellValue(b, column);
+
+                // Handle different data types
+                if (column === 'id') {
+                    return direction === 'asc'
+                        ? parseInt(aValue) - parseInt(bValue)
+                        : parseInt(bValue) - parseInt(aValue);
+                } else if (column === 'dateOfBirth') {
+                    return direction === 'asc'
+                        ? new Date(aValue) - new Date(bValue)
+                        : new Date(bValue) - new Date(aValue);
+                } else if (column === 'newsletters') {
+                    // Assuming newsletters is a boolean displayed as Yes/No
+                    const aBoolean = aValue.toLowerCase() === 'yes';
+                    const bBoolean = bValue.toLowerCase() === 'yes';
+                    return direction === 'asc'
+                        ? aBoolean - bBoolean
+                        : bBoolean - aBoolean;
+                } else {
+                    // String comparison for other columns
+                    return direction === 'asc'
+                        ? aValue.localeCompare(bValue)
+                        : bValue.localeCompare(aValue);
+                }
+            });
+
+            // Clear and repopulate tbody
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+            tbody.append(...sortedRows);
+        }
+
+        function getCellValue(row, column) {
+            // Find the cell index based on the header column
+            const headerCells = Array.from(document.querySelectorAll('th'));
+            const cellIndex = headerCells.findIndex(cell => cell.dataset.column === column);
+            return row.cells[cellIndex].textContent.trim();
+        }
+
+        function updateSortIndicators(activeTh) {
+            // Remove any existing indicators
+            document.querySelectorAll('th').forEach(th => {
+                const link = th.querySelector('a');
+                link.textContent = link.textContent.replace(' ↑', '').replace(' ↓', '');
+            });
+
+            // Add indicator to active column
+            const link = activeTh.querySelector('a');
+            const indicator = activeTh.dataset.sort === 'asc' ? ' ↑' : ' ↓';
+            link.textContent += indicator;
+        } *@
+</script>

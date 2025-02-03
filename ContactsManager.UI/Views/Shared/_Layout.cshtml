@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PersonsProject</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+</head>
+<body class="grid-rows-[auto_1fr_auto] bg relative grid h-screen gap-4 bg-gray-100">
+    <!-- Navbar -->
+    <nav class="absolute left-0 right-0 top-0 bg-blue-500 text-white shadow-md">
+        <div class="container mx-auto flex items-center justify-between px-4 py-2">
+            <!-- Project Name -->
+              <div class="flex items-center gap-3"> 
+                  <img src="/images/download.png" width="40px" height="40px" asp-append-version = "true"/>
+            <a class="cursor-pointer" href="/">
+                <span class="inline-blocke mr-1 text-2xl font-bold">
+                    PersonsProject
+                </span>
+            </a></div>
+
+            <!-- Links -->
+            <div class="space-x-4">
+                <a href="/" class="hover:text-gray-300">Persons</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto h-full max-h-full px-4 py-6">
+        @RenderBody()
+    </div>
+
+    <!-- Footer (Optional) -->
+    @*     <footer class="absolute bottom-0 left-0 right-0 mt-6 bg-gray-800 text-white">
+    *@
+
+    <footer class="mt-auto bg-gray-800 text-white">
+        <div class="container mx-auto px-4 py-4 text-center">
+            &copy; 2024 CrudTest. All rights reserved.
+        </div>
+    </footer>
+    @RenderSection("scripts", false)
+</body>
+</html>
+

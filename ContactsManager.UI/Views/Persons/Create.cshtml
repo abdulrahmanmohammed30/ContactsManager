@@ -1,0 +1,133 @@
+﻿@model PersonAddRequest;
+
+<div class="mx-auto mb-3 mt-10 h-full max-w-3xl rounded-lg bg-white p-6 shadow-lg">
+    <h1 class="mb-6 text-2xl font-semibold text-gray-700">Add a New Person</h1>
+    <form method="post" asp-action="CreatePerson" class="space-y-6">
+        <ul>
+            @if (ViewBag.errors != null)
+            {
+                @foreach (var error in ViewBag.errors)
+                {
+                    <li class="text-red-500">@error</li>
+                }
+            }
+
+        </ul>
+
+
+        <!-- First Name -->
+        <div>
+            <label asp-for="FirstName" class="block text-sm font-medium text-gray-700">First Name</label>
+            <input asp-for="FirstName"
+                   class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm transition-all focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Enter first name">
+            <span asp-validation-for="FirstName" class="text-red-500"></span>
+        </div>
+          
+        <!-- Last Name -->
+        <div>
+            <label asp-for="LastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+            <input asp-for="LastName"
+                   class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm transition-all focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Enter last name">
+            <span asp-validation-for="LastName" class="text-red-500"></span>
+        </div>
+
+        <!-- Email -->
+        <div>
+            <label asp-for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input asp-for="Email"
+                   class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm transition-all focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Enter email address">
+            <span asp-validation-for="Email" class="text-red-500"></span>
+        </div>
+
+        <!-- Date of Birth -->
+        <div>
+            <label asp-for="DateOfBirth" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+            <input asp-for="DateOfBirth"
+                   class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm transition-all focus:ring-blue-500 focus:border-blue-500">
+            <span asp-validation-for="DateOfBirth" class="text-red-500"></span>
+               </div>
+
+        <!-- Gender -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Gender</label>
+            <div class="mt-1 flex items-center space-x-4">
+                <label class="flex items-center space-x-2">
+                    <input type="radio" name="Gender" value="M" class="text-blue-600 focus:ring-blue-500" @(Model.Gender == 'M' ? "checked" : "")>
+                    <span>Male</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="radio" name="Gender" value="F" class="text-blue-600 focus:ring-blue-500" @(Model.Gender == 'F' ? "checked" : "")>
+                    <span>Female</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Country -->
+        @{
+            var countries = (List<CountryResponse>)ViewBag.countries;
+            var items = countries.Select(cur => new SelectListItem() { Value = cur.CountryID.ToString(), Text = cur.CountryName, Selected=Model.CountryId == cur.CountryID });
+
+            <div>
+                <label for="CountryId" class="block text-sm font-medium text-gray-700">Country</label>
+                <select asp-for="CountryId" asp-items="@items" class="form-control">
+                    <option value="">Select a country</option>
+                </select>
+                <span asp-validation-for="CountryId" class="text-red-500"></span>
+            </div>
+        }
+
+
+        <!-- Receive Newsletters -->
+        <div>
+            <label class="flex items-center space-x-2">
+                <input type="checkbox"
+                       id="ReceiveNewsLetters"
+                       name="ReceiveNewsLetters"
+                       class="text-blue-600 focus:ring-blue-500"
+                       value="@Model.ReceiveNewsLetters"
+                @(Model.ReceiveNewsLetters == true ? "checked" : "")>        
+
+                <span>Receive Newsletters</span>     
+            </label>
+        </div>
+
+
+        <!-- Submit Button -->
+        <div class="text-right">
+            <button type="submit"
+                    class="rounded-md bg-blue-500 px-6 py-2 font-semibold text-white shadow-md transition-all hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                Submit
+            </button>
+        </div>
+        <div asp-validation-summary="All" class="text-red-500"></div>
+    </form>
+</div>
+
+<script>
+    const checkbox = document.getElementById('ReceiveNewsLetters');
+    let receiveNewsLettersValue = checkbox.checked;
+
+    checkbox.addEventListener('change', () => {
+        receiveNewsLettersValue = checkbox.checked;
+        checkbox.value=checkbox.checked
+        console.log('Receive Newsletters:', receiveNewsLettersValue); // For debugging
+    });
+</script>
+
+@section scripts {
+    <script src="https://cdnjs.cloudflare1.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            asp-fallback-test="window.jQuery"
+            asp-fallback-src="~/js/jquery.min.js"> </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.4/jquery.validate.min.js"
+            asp-fallback-test="window.jQuery.validator"
+            asp-fallback-src="~/js/jquery.validate.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"
+            asp-fallback-test="window.jQuery.validator.unobtrusive"
+            asp-fallback-src="~/js/jquery.validate.unobtrusive.min.js"></script>
+}
+

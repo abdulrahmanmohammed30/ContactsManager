@@ -1,0 +1,142 @@
+﻿<div class="container mx-auto mt-10">
+    <div class="flex items-center space-x-4 rounded-lg bg-white p-4 shadow-md">
+        <!-- Dropdown Toggle -->
+        <div class="relative">
+            <button data-property="" id="dropdownButton" class="rounded-lg bg-blue-500 px-4 py-2 text-white transition duration-200 hover:bg-blue-600">
+                Select Property
+            </button>
+            <div id="dropdownMenu" class="z-10 absolute left-0 mt-2 hidden rounded-lg border border-gray-300 bg-white shadow-lg">
+                <ul class="py-2">
+                    @foreach (FilterableProperties property in Enum.GetValues(typeof(FilterableProperties)))
+                    {
+                        <li>
+                            <button class="block w-full px-4 py-2 text-left transition duration-200 hover:bg-blue-100"
+                                    data-value=@property.ToString()>
+                                @property
+                            </button>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <!-- Search Form -->
+        <div class="flex-1">
+            <form id="searchForm" class="flex">
+                <input type="text"
+                       id="searchInput"
+                       class="w-full rounded-l-lg border border-gray-300 px-4 py-2 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="Search..." />
+                <button id="submitBtn" type="button"
+                        class="rounded-r-lg bg-blue-500 px-6 py-2 text-white transition duration-200 hover:bg-blue-600">
+                    Search
+                </button>
+            </form>
+        </div>
+        <span id="clearAll" class="round cursor-pointer rounded bg-gray-100 px-2 text-sm text-red-500">Clear all</span>
+    </div>
+</div>
+
+<script>
+    // JavaScript for dropdown interaction
+    const dropdownButton = document.getElementById('dropdownButton');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const searchInput = document.getElementById('searchInput');
+    const propertyButtons = dropdownMenu.querySelectorAll('button');
+    const submitBtn = document.getElementById("submitBtn");
+    const clearAll=document.getElementById("clearAll");
+    // Toggle dropdown visibility
+    dropdownButton.addEventListener('click', () => {
+        dropdownMenu.classList.toggle('hidden');
+    });
+
+    clearAll.addEventListener('click', async()=> {
+            dropdownButton.textContent = "Select Property";
+            dropdownButton.dataset.property = "";
+            searchInput.placeholder = `Search...`;
+            searchInput.value="";
+
+            try {
+                const response = await fetch(`/persons/data`);
+                const data = await response.json();
+                populateTable(data);
+            } catch (error) {
+                console.error("Error fetching sorted data:", error);
+            }
+    });
+
+    // Set selected property
+    propertyButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const selectedProperty = e.target.getAttribute('data-value');
+            dropdownButton.textContent = selectedProperty;
+            dropdownButton.dataset.property = selectedProperty;
+            dropdownMenu.classList.add('hidden');
+            searchInput.placeholder = `Search by ${selectedProperty}...`;
+        });
+    });
+
+    // Close dropdown if clicked outside
+    window.addEventListener('click', (e) => {
+        if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // send the request and update the table
+
+    submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        var property = dropdownButton.dataset.property;
+        var searchTerm = searchInput.value;
+
+        if (property != "") {
+            try {
+                const response = await fetch(`/persons/filter?property=${property}&searchTerm=${searchTerm}`);
+                const data = await response.json();
+                populateTable(data);
+            } catch (error) {
+                console.error("Error fetching sorted data:", error);
+            }
+        }
+
+    })
+
+    function populateTable(data) {
+        const tableBody = document.getElementById("rows");
+        tableBody.innerHTML = ""; // Clear the existing rows
+
+        data.forEach(person => {
+
+            const row = document.createElement("tr");
+            row.className = "border-b transition hover:bg-gray-100";
+
+            row.innerHTML = `
+                    <td class="px-6 py-4">${person.personId}</td>
+                    <td class="px-6 py-4">${person.firstName}</td>
+                    <td class="px-6 py-4">${person.lastName}</td>
+                    <td class="px-6 py-4">${person.email}</td>
+                    <td class="px-6 py-4">
+                            ${person.dateOfBirth ? new Date(person.dateOfBirth).toISOString().split('T')[0] : '<span>N/A</span>'}
+                       </td>
+                    <td class="px-6 py-4">${person.gender}</td>
+                    <td class="px-6 py-4">${person.countryId}</td>
+                    <td class="px-6 py-4">
+                        ${person.receiveNewsLetters ? "Yes" : "No"}
+                    </td>
+                     <td>
+                            <a href="/persons/delete/${person.personId}"
+                               class="text-red-500 transition hover:text-red-600">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                            <a href="/persons/update/${person.personId}"
+                               class="ml-2 text-blue-500 transition hover:text-blue-600">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                    </td>
+                `;
+            tableBody.appendChild(row);
+        });
+    }
+
+</script>

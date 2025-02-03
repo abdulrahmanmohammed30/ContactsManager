@@ -1,0 +1,76 @@
+﻿@model List<PersonResponse>
+
+@{
+    Layout = null;
+}
+
+<div class="container mx-auto mt-8 max-h-full overflow-y-auto">
+    <div class="max-h-full overflow-y-auto">
+        <table class="max-h-[calc(100vh-12rem)] min-w-full overflow-y-auto rounded-lg bg-white shadow-md">
+            <!-- Table Header -->
+            <thead class="bg-gray-200 text-sm uppercase text-gray-700">
+                <tr id="tableHeaders">
+                    <th class="px-6 py-3 text-left" data-column="personId" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">ID</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="firstname" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">First Name</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="lastname" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Last Name</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="email" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Email</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="dateOfBirth" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Date of Birth</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="gender" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Gender</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="countryid" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Country</a>
+                    </th>
+                    <th class="px-6 py-3 text-left" data-column="receiveNewsLetters" data-sort="asc">
+                        <a href="#" class="transition hover:text-blue-600">Newsletters</a>
+                    </th>
+                </tr>
+            </thead>
+
+            <!-- Table Body -->
+            <tbody id="rows">
+                @foreach (var person in @Model)
+                {
+                    <tr class="border-b transition hover:bg-gray-100">
+                        <td class="px-6 py-4">@person.PersonId</td>
+                        <td class="px-6 py-4">@person.FirstName</td>
+                        <td class="px-6 py-4">@person.LastName</td>
+                        <td class="px-6 py-4">@person.Email</td>
+                        <td class="px-6 py-4">
+                            @if (person.DateOfBirth != null)
+                            {
+                                @DateOnly.FromDateTime(person.DateOfBirth.Value).ToString("yyyy-MM-dd")
+                            }
+                            else
+                            { 
+                                <span>N/A</span> <!-- Or any placeholder for missing date -->
+                            }
+                        </td>
+                        <td class="px-6 py-4">@person.Gender</td>
+                        <td class="px-6 py-4">@person.CountryName</td>
+                        <td class="px-6 py-4">
+                            @if (@person.ReceiveNewsLetters == true)
+                            {
+                                <text>Yes</text>
+                            }
+                            else
+                            {
+                                <text>No</text>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
